@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER PRIMARY KEY,
-    "email" TEXT NOT NULL UNIQUE,
+    "email" TEXT NOT NULL UNIQUE, -- Adding a unique idx like this is a big mistake. This column cannot be altered.
     "password_hash" TEXT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

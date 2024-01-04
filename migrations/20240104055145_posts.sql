@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS "posts" (
     "user_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE ("title", "user_id"),
     FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
+CREATE UNIQUE INDEX "idx_user_post" ON "posts"("title", "user_id");
 
 CREATE TABLE IF NOT EXISTS "post_likes" (
     "user_id" INTEGER NOT NULL,
@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS "post_comments" (
 );
 
 -- +goose Down
+DROP INDEX "idx_user_post";
 DROP TABLE IF EXISTS "post_comments";
 DROP TABLE IF EXISTS "post_likes";
 DROP TABLE IF EXISTS "posts";
