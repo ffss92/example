@@ -22,9 +22,6 @@ type User struct {
 	PasswordHash string    `json:"-"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
-
-	// Deprecated in favor of username
-	Email string `json:"-"`
 }
 
 func (u *User) IsAnonymous() bool {
