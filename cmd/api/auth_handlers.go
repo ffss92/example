@@ -18,7 +18,7 @@ func (a api) handleSignUp(w http.ResponseWriter, r *http.Request) {
 	user, err := a.auth.CreateUser(input)
 	if err != nil {
 		switch {
-		case errors.Is(err, auth.ErrDuplicateEmail), errors.Is(err, auth.ErrDuplicateUsername):
+		case errors.Is(err, auth.ErrDuplicateUser):
 			a.conflictError(w, r, err)
 		default:
 			a.serverError(w, r, err)

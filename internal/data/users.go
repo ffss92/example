@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/ffss92/example/internal/auth"
@@ -27,8 +26,8 @@ func (s Store) InsertUser(user *auth.User) error {
 
 	if err != nil {
 		switch {
-		case strings.Contains(err.Error(), "users.username"):
-			return auth.ErrDuplicateUsername
+		case isUniqueError(err, "users", "username"):
+			return fmt.Errorf("%w: username", auth.ErrDuplicateUser)
 		default:
 			return fmt.Errorf("failed to insert user to db: %w", err)
 		}
