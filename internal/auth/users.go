@@ -29,11 +29,15 @@ func (u *User) IsAnonymous() bool {
 }
 
 type CreateUserParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required,min=3,max=60"`
+	Password string `json:"password" validate:"required,min=8,max=120"`
 }
 
 func (s Service) CreateUser(params CreateUserParams) (*User, error) {
+	if err := s.validate.Struct(params); err != nil {
+		return nil, err
+	}
+
 	pwHash, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create password hash: %w", err)
@@ -75,11 +79,15 @@ func (s Service) GetUserForToken(plainText string, scope Scope) (*User, error) {
 }
 
 type CredentialsParam struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required,min=3,max=60"`
+	Password string `json:"password" validate:"required,min=8,max=120"`
 }
 
 func (s Service) Authenticate(creds CredentialsParam) (*Token, error) {
+	if err := s.validate.Struct(creds); err != nil {
+		return nil, err
+	}
+
 	user, err := s.storer.GetUserByUsername(creds.Username)
 	if err != nil {
 		switch {

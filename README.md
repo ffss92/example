@@ -4,7 +4,7 @@ This a sample Go REST API implementation.
 
 ## TODOs
 
-- [ ] Add validation using [validator](https://github.com/go-playground/validator);
+- [X] Add validation using [validator](https://github.com/go-playground/validator);
 - [ ] Add a `posts` resource - users should be able to create new posts, like and comment them;
 - [X] Change user's `email` field to `username` for privacy reasons.
 - [ ] Split the `auth` package into `users` and `auth`.

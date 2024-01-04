@@ -3,6 +3,8 @@ package main
 import (
 	"log/slog"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -64,5 +66,20 @@ func (a api) conflictError(w http.ResponseWriter, r *http.Request, err error) {
 func (a api) invalidCredsError(w http.ResponseWriter, r *http.Request) {
 	a.writeError(w, r, http.StatusUnauthorized, errorResponse{
 		Message: "invalid user credentials",
+	})
+}
+
+// Writes a 422 response to the client with the validation details.
+func (a api) validationError(w http.ResponseWriter, r *http.Request, ve validator.ValidationErrors) {
+	details := make(map[string]string, len(ve))
+
+	for _, e := range ve {
+		trans, _ := a.uni.GetTranslator("en")
+		details[e.Field()] = e.Translate(trans)
+	}
+
+	a.writeError(w, r, http.StatusUnprocessableEntity, errorResponse{
+		Message: "validation failed",
+		Details: details,
 	})
 }

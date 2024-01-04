@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ffss92/example/internal/auth"
+	"github.com/go-playground/validator/v10"
 )
 
 // Registers a user.
@@ -17,7 +18,10 @@ func (a api) handleSignUp(w http.ResponseWriter, r *http.Request) {
 
 	user, err := a.auth.CreateUser(input)
 	if err != nil {
+		var ve validator.ValidationErrors
 		switch {
+		case errors.As(err, &ve):
+			a.validationError(w, r, ve)
 		case errors.Is(err, auth.ErrDuplicateUser):
 			a.conflictError(w, r, err)
 		default:
@@ -41,7 +45,10 @@ func (a api) handleSignIn(w http.ResponseWriter, r *http.Request) {
 
 	token, err := a.auth.Authenticate(input)
 	if err != nil {
+		var ve validator.ValidationErrors
 		switch {
+		case errors.As(err, &ve):
+			a.validationError(w, r, ve)
 		case errors.Is(err, auth.ErrInvalidCredentials):
 			a.invalidCredsError(w, r)
 		default:
