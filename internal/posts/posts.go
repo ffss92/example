@@ -14,18 +14,18 @@ type Post struct {
 	Content   string    `json:"content"`
 	Likes     int64     `json:"likes"`
 	Author    string    `json:"author"`
+	UserID    int64     `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-
-	UserID int64 `json:"-"`
 }
 
 type CreatePostParams struct {
-	Title   string `json:"title" validate:"required,min=2,max=50"`
-	Content string `json:"content" validate:"required,max=250"`
+	User    *auth.User `json:"-" validate:"required"`
+	Title   string     `json:"title" validate:"required,min=2,max=50"`
+	Content string     `json:"content" validate:"required,max=250"`
 }
 
-func (s Service) CreatePost(user *auth.User, params CreatePostParams) (*Post, error) {
+func (s Service) CreatePost(params CreatePostParams) (*Post, error) {
 	if err := validate.Struct(params); err != nil {
 		return nil, err
 	}
@@ -33,9 +33,8 @@ func (s Service) CreatePost(user *auth.User, params CreatePostParams) (*Post, er
 	post := &Post{
 		Title:   params.Title,
 		Content: params.Content,
-		UserID:  user.ID,
-		Author:  user.Username,
-		Likes:   0,
+		UserID:  params.User.ID,
+		Author:  params.User.Username,
 	}
 
 	if err := s.storer.InsertPost(post); err != nil {
@@ -86,20 +85,24 @@ func (s Service) DeletePost(user *auth.User, postId int64) error {
 }
 
 type UpdatePostParams struct {
-	Title   string `json:"title" validate:"required,min=2,max=50"`
-	Content string `json:"content" validate:"required,max=250"`
+	User    *auth.User `json:"-" validate:"required"`
+	PostID  int64      `json:"-" validate:"required"`
+	Title   string     `json:"title" validate:"required,min=2,max=50"`
+	Content string     `json:"content" validate:"required,max=250"`
 }
 
-func (s Service) UpdatePost(user *auth.User, postId int64, params UpdatePostParams) error {
+func (s Service) UpdatePost(params UpdatePostParams) error {
 	if err := validate.Struct(params); err != nil {
 		return err
 	}
 
-	post, err := s.storer.GetPost(postId)
+	post, err := s.storer.GetPost(params.PostID)
 	if err != nil {
 		return err
 	}
-	if post.UserID != user.ID {
+
+	isOwner := post.UserID == params.User.ID
+	if !isOwner {
 		return ErrNotAllowed
 	}
 

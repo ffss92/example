@@ -20,7 +20,8 @@ func (a api) handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := a.posts.CreatePost(user, input)
+	input.User = user
+	post, err := a.posts.CreatePost(input)
 	if err != nil {
 		var ve validator.ValidationErrors
 		switch {
@@ -112,7 +113,9 @@ func (a api) handleUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.posts.UpdatePost(user, postId, input); err != nil {
+	input.User = user
+	input.PostID = postId
+	if err := a.posts.UpdatePost(input); err != nil {
 		switch {
 		case errors.Is(err, posts.ErrNotAllowed):
 			a.forbiddenError(w, r)
@@ -170,6 +173,135 @@ func (a api) handleDislikePost(w http.ResponseWriter, r *http.Request) {
 			a.serverError(w, r, err)
 		}
 		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a api) handleCreateComment(w http.ResponseWriter, r *http.Request) {
+	user := a.mustGetUser(r.Context())
+	postId, err := strconv.ParseInt(chi.URLParam(r, "postId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	var input posts.CreateCommentParams
+	if err := readJSON(r, &input); err != nil {
+		a.clientError(w, r, err)
+		return
+	}
+	input.User = user
+	input.PostID = postId
+
+	comment, err := a.posts.CreateComment(input)
+	if err != nil {
+		var ve validator.ValidationErrors
+		switch {
+		case errors.As(err, &ve):
+			a.validationError(w, r, ve)
+		case errors.Is(err, posts.ErrNotFound):
+			a.notFoundError(w, r)
+		default:
+			a.serverError(w, r, err)
+		}
+		return
+	}
+
+	if err := writeJSON(w, http.StatusOK, comment); err != nil {
+		a.serverError(w, r, err)
+	}
+}
+
+func (a api) handleListComments(w http.ResponseWriter, r *http.Request) {
+	postId, err := strconv.ParseInt(chi.URLParam(r, "postId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	p := pagination.FromRequest(r)
+	comments, err := a.posts.ListComments(postId, p)
+	if err != nil {
+		a.serverError(w, r, err)
+		return
+	}
+
+	if err := writeJSON(w, http.StatusOK, comments); err != nil {
+		a.serverError(w, r, err)
+	}
+}
+
+func (a api) handleDeleteComment(w http.ResponseWriter, r *http.Request) {
+	user := a.mustGetUser(r.Context())
+
+	postId, err := strconv.ParseInt(chi.URLParam(r, "postId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	commentId, err := strconv.ParseInt(chi.URLParam(r, "commentId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	err = a.posts.DeleteComment(posts.DeletePostParams{
+		User:      user,
+		PostID:    postId,
+		CommentID: commentId,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, posts.ErrNotFound):
+			a.notFoundError(w, r)
+		case errors.Is(err, posts.ErrNotAllowed):
+			a.forbiddenError(w, r)
+		default:
+			a.serverError(w, r, err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a api) handleUpdateComment(w http.ResponseWriter, r *http.Request) {
+	user := a.mustGetUser(r.Context())
+
+	postId, err := strconv.ParseInt(chi.URLParam(r, "postId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	commentId, err := strconv.ParseInt(chi.URLParam(r, "commentId"), 10, 64)
+	if err != nil || postId < 1 {
+		a.notFoundError(w, r)
+		return
+	}
+
+	var input posts.UpdateCommentParams
+	if err := readJSON(r, &input); err != nil {
+		a.clientError(w, r, err)
+		return
+	}
+
+	input.CommentID = commentId
+	input.PostID = postId
+	input.User = user
+
+	if err := a.posts.UpdateComment(input); err != nil {
+		var ve validator.ValidationErrors
+		switch {
+		case errors.As(err, &ve):
+			a.validationError(w, r, ve)
+		case errors.Is(err, posts.ErrNotFound):
+			a.notFoundError(w, r)
+		default:
+			a.serverError(w, r, err)
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)

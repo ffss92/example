@@ -10,6 +10,13 @@ type Storer interface {
 
 	InsertPostLike(userId int64, postId int64) error
 	DeletePostLike(userId int64, postId int64) error
+
+	GetComment(postId, commentId int64) (*Comment, error)
+	InsertPostComment(*Comment) error
+	ListPostComments(postId int64, limit int, offset int) ([]*Comment, error)
+	DeletePostComment(int64) error
+	UpdatePostComment(*Comment) error
+	CountPostComments(postId int64) (int, error)
 }
 
 type Service struct {

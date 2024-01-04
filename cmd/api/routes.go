@@ -27,6 +27,10 @@ func (a api) routes() *chi.Mux {
 		r.Delete("/{postId}", a.requireAuth(a.handleDeletePost))
 		r.Post("/{postId}/likes", a.requireAuth(a.handleLikePost))
 		r.Delete("/{postId}/likes", a.requireAuth(a.handleDislikePost))
+		r.Post("/{postId}/comments", a.requireAuth(a.handleCreateComment))
+		r.Get("/{postId}/comments", a.handleListComments)
+		r.Delete("/{postId}/comments/{commentId}", a.requireAuth(a.handleDeleteComment))
+		r.Put("/{postId}/comments/{commentId}", a.requireAuth(a.handleUpdateComment))
 	})
 
 	return r
