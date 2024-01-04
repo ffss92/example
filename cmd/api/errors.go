@@ -19,14 +19,14 @@ type errorResponse struct {
 // Writes a standard error message to the client.
 func (a api) writeError(w http.ResponseWriter, r *http.Request, status int, res errorResponse) {
 	if err := writeJSON(w, status, res); err != nil {
-		a.logger.Error("failed to write error response", slog.String("err", err.Error()))
+		a.log.Error("failed to write error response", slog.String("err", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
 // Logs the error and writes a 500 error response to the client.
 func (a api) serverError(w http.ResponseWriter, r *http.Request, err error) {
-	a.logger.Error("unexpected error in handler", slog.String("err", err.Error()))
+	a.log.Error("unexpected error in handler", slog.String("err", err.Error()))
 	a.writeError(w, r, http.StatusInternalServerError, errorResponse{
 		Message: "internal server error",
 	})

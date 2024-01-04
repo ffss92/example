@@ -14,9 +14,9 @@ func (a api) serve() error {
 		Handler:      a.routes(),
 		WriteTimeout: time.Second * 10,
 		ReadTimeout:  time.Second * 5,
-		ErrorLog:     slog.NewLogLogger(a.logger.Handler(), slog.LevelError),
+		ErrorLog:     slog.NewLogLogger(a.log.Handler(), slog.LevelError),
 	}
 
-	a.logger.Info(fmt.Sprintf("listening on http://localhost:%d", a.cfg.Port))
+	a.log.Info(fmt.Sprintf("listening on http://localhost:%d", a.cfg.Port))
 	return srv.ListenAndServe()
 }

@@ -1,7 +1,5 @@
 package auth
 
-import "github.com/go-playground/validator/v10"
-
 type Storer interface {
 	// Users
 	InsertUser(*User) error
@@ -17,13 +15,11 @@ type Storer interface {
 }
 
 type Service struct {
-	storer   Storer
-	validate *validator.Validate
+	storer Storer
 }
 
-func NewService(storer Storer, validate *validator.Validate) Service {
+func NewService(storer Storer) Service {
 	return Service{
-		storer:   storer,
-		validate: validate,
+		storer: storer,
 	}
 }

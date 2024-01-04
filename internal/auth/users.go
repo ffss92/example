@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ffss92/example/internal/validate"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -34,7 +35,7 @@ type CreateUserParams struct {
 }
 
 func (s Service) CreateUser(params CreateUserParams) (*User, error) {
-	if err := s.validate.Struct(params); err != nil {
+	if err := validate.Struct(params); err != nil {
 		return nil, err
 	}
 
@@ -84,7 +85,7 @@ type CredentialsParam struct {
 }
 
 func (s Service) Authenticate(creds CredentialsParam) (*Token, error) {
-	if err := s.validate.Struct(creds); err != nil {
+	if err := validate.Struct(creds); err != nil {
 		return nil, err
 	}
 

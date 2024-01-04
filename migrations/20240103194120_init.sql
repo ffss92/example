@@ -1,11 +1,12 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER PRIMARY KEY,
-    "email" TEXT NOT NULL UNIQUE, -- Adding a unique idx like this is a big mistake. This column cannot be altered.
+    "username" TEXT NOT NULL,
     "password_hash" TEXT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE UNIQUE INDEX "idx_users_username" ON "users"("username");
 
 CREATE TABLE IF NOT EXISTS "tokens" (
     "hash" BLOB PRIMARY KEY,
