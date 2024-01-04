@@ -116,3 +116,7 @@ func (s Service) Authenticate(creds CredentialsParam) (*Token, error) {
 
 	return token, nil
 }
+
+func (s Service) DeleteUser(userId int64) error {
+	return s.storer.DeleteUser(userId)
+}

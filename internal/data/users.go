@@ -65,35 +65,6 @@ func (s Store) GetUser(id int64) (*auth.User, error) {
 	return &user, nil
 }
 
-func (s Store) GetUserByEmail(email string) (*auth.User, error) {
-	query := `
-	SELECT id, username, password_hash, created_at, updated_at 
-	FROM users WHERE email = $1`
-
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	var user auth.User
-	err := s.db.QueryRowContext(ctx, query, email).Scan(
-		&user.ID,
-		&user.Username,
-		&user.PasswordHash,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-	)
-
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return nil, auth.ErrNotFound
-		default:
-			return nil, fmt.Errorf("failed to get user from db: %w", err)
-		}
-	}
-
-	return &user, nil
-}
-
 func (s Store) GetUserByUsername(username string) (*auth.User, error) {
 	query := `
 	SELECT id, username, password_hash, created_at, updated_at 
