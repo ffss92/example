@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+// Helper for writing json responses.
+type m map[string]any
+
 // Writes a json response to the client.
 func writeJSON(w http.ResponseWriter, status int, v any) error {
 	b, err := json.Marshal(v)
@@ -23,6 +26,5 @@ func readJSON(r *http.Request, v any) error {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		return err
 	}
-
 	return nil
 }

@@ -83,3 +83,17 @@ func (a api) validationError(w http.ResponseWriter, r *http.Request, ve validato
 		Details: details,
 	})
 }
+
+// Writes a 404 response to the client.
+func (a api) notFoundError(w http.ResponseWriter, r *http.Request) {
+	a.writeError(w, r, http.StatusNotFound, errorResponse{
+		Message: "resource not found",
+	})
+}
+
+// Writes a 403 response to the client.
+func (a api) forbiddenError(w http.ResponseWriter, r *http.Request) {
+	a.writeError(w, r, http.StatusForbidden, errorResponse{
+		Message: "you don't have the required permissions to access this resource",
+	})
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/ffss92/example/internal/config"
 	"github.com/ffss92/example/internal/data"
 	"github.com/ffss92/example/internal/infra"
+	"github.com/ffss92/example/internal/posts"
 	"github.com/ffss92/example/internal/validate"
 	"github.com/ffss92/example/migrations"
 	"github.com/go-playground/locales/en"
@@ -19,10 +20,11 @@ import (
 
 // The main application struct.
 type api struct {
-	cfg  config.Config
-	log  *slog.Logger
-	auth auth.Service
-	uni  *ut.UniversalTranslator
+	cfg   config.Config
+	log   *slog.Logger
+	uni   *ut.UniversalTranslator
+	auth  auth.Service
+	posts posts.Service
 }
 
 func main() {
@@ -54,14 +56,16 @@ func main() {
 	en_translations.RegisterDefaultTranslations(validate.Validator(), trans)
 
 	// Services
-	authService := auth.NewService(store)
+	auth := auth.NewService(store)
+	posts := posts.NewService(store)
 
 	// API
 	api := &api{
-		cfg:  cfg,
-		log:  slog.New(slog.NewJSONHandler(os.Stdout, nil)),
-		auth: authService,
-		uni:  uni,
+		cfg:   cfg,
+		log:   slog.New(slog.NewJSONHandler(os.Stdout, nil)),
+		uni:   uni,
+		auth:  auth,
+		posts: posts,
 	}
 	log.Fatal(api.serve())
 }
