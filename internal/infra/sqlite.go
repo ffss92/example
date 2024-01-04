@@ -7,7 +7,8 @@ import (
 )
 
 func ConnectSqlite(dbPath string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite", "example.db")
+	pragmas := "?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_pragma=foreign_keys(ON)"
+	db, err := sql.Open("sqlite", dbPath+pragmas)
 	if err != nil {
 		return nil, err
 	}

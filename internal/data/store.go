@@ -1,15 +1,19 @@
 package data
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/ffss92/example/internal/auth"
+)
+
+// We make sure at compile time that Store implements users.Storer without allocating.
+var _ auth.Storer = (*Store)(nil)
 
 type Store struct {
 	db *sql.DB
 }
 
 func NewStore(db *sql.DB) Store {
-	// Ignore errors for brevity
-	db.Exec(`CREATE TABLE IF NOT EXISTS players (id INTEGER PRIMARY KEY, name TEXT NOT NULL);`)
-
 	return Store{
 		db: db,
 	}
