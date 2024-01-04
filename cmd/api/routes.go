@@ -25,9 +25,8 @@ func (a api) routes() *chi.Mux {
 		r.Get("/{postId}", a.handleGetPost)
 		r.Put("/{postId}", a.requireAuth(a.handleUpdatePost))
 		r.Delete("/{postId}", a.requireAuth(a.handleDeletePost))
-
-		r.Post("/{postId}/like", a.requireAuth(a.handleLikePost))
-		r.Delete("/{postId}/like", a.requireAuth(a.handleDislikePost))
+		r.Post("/{postId}/likes", a.requireAuth(a.handleLikePost))
+		r.Delete("/{postId}/likes", a.requireAuth(a.handleDislikePost))
 	})
 
 	return r

@@ -36,21 +36,24 @@ func (s Store) InsertPost(post *posts.Post) error {
 	return nil
 }
 
-// TODO: Include like count
 func (s Store) GetPost(id int64) (*posts.Post, error) {
 	query := `
-	SELECT 
-		p.id, 
-		p.title, 
+	SELECT
+		p.id,
+		p.title,
 		p.content, 
-		p.user_id, 
+		p.user_id,
 		p.created_at, 
-		p.updated_at, 
-		u.username
+		p.updated_at,
+		u.username,
+		COUNT(pl.post_id)
 	FROM posts p
 	INNER JOIN users u
 	ON u.id = p.user_id
-	WHERE p.id = $1`
+	LEFT JOIN post_likes pl
+	ON pl.post_id = p.id
+	WHERE p.id = $1
+	GROUP BY p.id`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -64,6 +67,7 @@ func (s Store) GetPost(id int64) (*posts.Post, error) {
 		&post.CreatedAt,
 		&post.UpdatedAt,
 		&post.Author,
+		&post.Likes,
 	)
 
 	if err != nil {
