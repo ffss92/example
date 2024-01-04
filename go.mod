@@ -3,7 +3,9 @@ module github.com/ffss92/example
 go 1.21.0
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.11
+	github.com/joho/godotenv v1.5.1
 	github.com/pressly/goose/v3 v3.17.0
 	golang.org/x/crypto v0.16.0
 	modernc.org/sqlite v1.28.0

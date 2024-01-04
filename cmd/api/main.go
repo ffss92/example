@@ -1,42 +1,38 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"log/slog"
 	"os"
 
 	"github.com/ffss92/example/internal/auth"
+	"github.com/ffss92/example/internal/config"
 	"github.com/ffss92/example/internal/data"
 	"github.com/ffss92/example/internal/infra"
 	"github.com/ffss92/example/migrations"
+	_ "github.com/joho/godotenv/autoload"
 )
-
-type config struct {
-	port   int
-	dbPath string
-}
 
 // The main application struct.
 type api struct {
-	cfg    config
+	cfg    config.Config
 	logger *slog.Logger
 	auth   auth.Service
 }
 
 func main() {
 	// Config
-	var cfg config
-
-	flag.IntVar(&cfg.port, "port", 5000, "sets the server port")
-	flag.StringVar(&cfg.dbPath, "db", "example.db", "sets the sqlite database path")
-	flag.Parse()
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cfg.Dump(os.Stdout)
 
 	// Logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	// Database
-	db, err := infra.ConnectSqlite(cfg.dbPath)
+	db, err := infra.ConnectSqlite(cfg.DatabasePath)
 	if err != nil {
 		log.Fatal(err)
 	}

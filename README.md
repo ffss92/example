@@ -4,7 +4,10 @@ This a sample Go REST API implementation.
 
 ## TODOs
 
-- [ ] Add validation using [validator](https://github.com/go-playground/validator).
+- [ ] Add validation using [validator](https://github.com/go-playground/validator);
+- [ ] Add JWT instead of stateful tokens, since it's what's most people use;
+- [ ] Add a *Posts* resource - users should be able to create new posts, like and comment them;
+- [ ] Add a React client.
 
 
 ## Requirements
@@ -14,6 +17,38 @@ This a sample Go REST API implementation.
 - [reflex](https://github.com/cespare/reflex) - file watcher (optional)
 - [make](https://www.gnu.org/software/make/) - tool for generating executables (optional)
 
+## Settings
+
+The project configuration is done using environment variables or a `.env` file. 
+All settings are defined in the `.env.example` file at the root of the project.
+
+Enviroment variables validation is done using the awesome [env](https://github.com/caarlos0/env)
+package.
+
+The available settings are described below:
+
+#### APP_PORT 
+Defines which port the http server listens to. Defaults to `4000`.
+
+#### APP_ENV 
+Defines which environemnt the application is currently running. 
+Should be set to `development` or `production`. Defaults to `development`.
+
+#### SECRET_KEY
+**Required**. Defines the secret key used to sign JWT tokens.
+
+If you have [openssl](https://www.openssl.org/) installed, run the command below to generate
+a new secret key:
+
+```bash
+openssl rand -base64 32
+```
+
+#### DATABASE_PATH
+
+Sets the path to the sqlite database. Defaults to `example.db`.
+
+All of the settings are defined in the `internal/config` package. If a variable is sensitive, like `SECRET_KEY`, it should be set using the `config.Secret` type.
 
 ## Quick start
 
