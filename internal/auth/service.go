@@ -1,14 +1,17 @@
 package auth
 
 type Storer interface {
+	// Users
+	InsertUser(*User) error
 	GetUser(int64) (*User, error)
 	GetUserByEmail(string) (*User, error)
+	GetUserByUsername(string) (*User, error)
 	GetUserForToken([]byte, Scope) (*User, error)
 	DeleteUser(int64) error
 
+	// Tokens
 	DeleteTokensForUser(int64, Scope) error
 	InsertToken(*Token) error
-	InsertUser(*User) error
 }
 
 type Service struct {

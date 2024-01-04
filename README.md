@@ -5,8 +5,10 @@ This a sample Go REST API implementation.
 ## TODOs
 
 - [ ] Add validation using [validator](https://github.com/go-playground/validator);
+- [ ] Add a `posts` resource - users should be able to create new posts, like and comment them;
+- [X] Change user's `email` field to `username` for privacy reasons.
+- [ ] Split the `auth` package into `users` and `auth`.
 - [ ] Add JWT instead of stateful tokens, since it's what's most people use;
-- [ ] Add a *Posts* resource - users should be able to create new posts, like and comment them;
 - [ ] Add a React client.
 
 
@@ -72,7 +74,7 @@ To create a new user, make a `POST` request to `/auth/sign-up`, like the example
 POST /auth/sign-up
 
 {
-    "email": "user@example.com",
+    "username": "user@example.com",
     "password": "123123123"
 }
 ```  
@@ -86,7 +88,7 @@ To authenticate a user (login), make a `POST` request to `/auth/sign-in`, like t
 POST /auth/sign-in
 
 {
-    "email": "user@example.com",
+    "username": "user@example.com",
     "password": "123123123"
 }
 ```

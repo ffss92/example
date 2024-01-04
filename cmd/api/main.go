@@ -10,14 +10,16 @@ import (
 	"github.com/ffss92/example/internal/data"
 	"github.com/ffss92/example/internal/infra"
 	"github.com/ffss92/example/migrations"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 // The main application struct.
 type api struct {
-	cfg    config.Config
-	logger *slog.Logger
-	auth   auth.Service
+	cfg      config.Config
+	logger   *slog.Logger
+	validate *validator.Validate
+	auth     auth.Service
 }
 
 func main() {

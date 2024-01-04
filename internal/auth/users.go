@@ -18,10 +18,13 @@ var (
 
 type User struct {
 	ID           int64     `json:"id"`
-	Email        string    `json:"email"`
+	Username     string    `json:"username"`
 	PasswordHash string    `json:"-"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+
+	// Deprecated in favor of username
+	Email string `json:"-"`
 }
 
 func (u *User) IsAnonymous() bool {
@@ -29,7 +32,7 @@ func (u *User) IsAnonymous() bool {
 }
 
 type CreateUserParams struct {
-	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -40,7 +43,7 @@ func (s Service) CreateUser(params CreateUserParams) (*User, error) {
 	}
 
 	user := &User{
-		Email:        params.Email,
+		Username:     params.Username,
 		PasswordHash: string(pwHash),
 	}
 
@@ -75,12 +78,12 @@ func (s Service) GetUserForToken(plainText string, scope Scope) (*User, error) {
 }
 
 type CredentialsParam struct {
-	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 func (s Service) Authenticate(creds CredentialsParam) (*Token, error) {
-	user, err := s.storer.GetUserByEmail(creds.Email)
+	user, err := s.storer.GetUserByUsername(creds.Username)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrNotFound):
